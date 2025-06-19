@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - {{ username }}'s Posts</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="navbar">
+    <a href="{{ url_for('posts.feed') }}">
+      <img src="{{ url_for('static', filename='logo2.png') }}" alt="Reddit Clone" class="logo">
+    </a>
+    <div>
+      <span class="profile-link2">
+        <img src="{{ url_for('static', filename='avatar.png') }}" alt="profile" class="logo2"> a/{{ session['user'] }}
+      </span> | 
+      <a href="{{ url_for('admin.users') }}">Manage Users</a> | 
+      <a href="{{ url_for('posts.feed') }}">User View</a> | 
+      <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>{{ username }}'s Posts</h1>
+    <p><a href="{{ url_for('admin.users') }}">&larr; Back to users</a></p>
+    
+    {% if posts %}
+      {% for post in posts %}
+      <div class="post-card">
+        <p class="author">
+          {% if post.author == 'admin_rc' %}a/{% else %}u/{% endif %}{{ post.author }} · 
+          <span class="post-time" data-time="{{ post.created_at.isoformat() }}">just now</span>
+        </p>
+        <h2>
+          <a href="{{ url_for('posts.post_detail', post_id=post._id) }}">{{ post.title }}</a>
+        </h2>
+        <p class="post-text">{{ post.content[:150] }}{% if post.content|length > 150 %}...{% endif %}</p>
+        
+        <div class="post-actions">
+            <div class="vote-buttons">
+            <form action="{{ url_for('posts.upvote', post_id=post._id) }}" method="POST">
+                <button type="submit" class="vote-btn {% if post.upvoted %}active{% endif %}">
+                ▲
+                </button>
+            </form>
+            <span class="vote-count">{{ post.votes }}</span>
+            <form action="{{ url_for('posts.downvote', post_id=post._id) }}" method="POST">
+                <button type="submit" class="vote-btn down {% if post.downvoted %}active{% endif %}"
+                        {% if post.votes <= 0 and not post.downvoted %}disabled{% endif %}>
+                ▼
+                </button>
+            </form>
+            </div>
+    
+            <a href="{{ url_for('posts.post_detail', post_id=post._id) }}" class="comment-link">
+            <span class="comment-count">{{ post.comment_count }}</span>
+            <span>comments</span>
+            </a>
+            <form action="{{ url_for('posts.delete', post_id=post._id) }}" method="POST" 
+                onsubmit="return confirm('Are you sure you want to delete this post?');"
+                class="delete-form">
+            <button type="submit2" class="delete-btn">Delete post</button>
+            </form>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p>No posts found for this user.</p>
+    {% endif %}
+  </div>
+
+  <script>
+    function formatRelativeTime(timeString) {
+      const now = new Date();
+      const postTime = new Date(timeString.endsWith('Z') ? timeString : timeString + 'Z');
+      const diffInSeconds = Math.floor((now - postTime) / 1000);
+      
+      if (diffInSeconds < 5) return "just now";
+      if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+      if (diffInSeconds < 120) return "1 minute ago";
+      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds/60)} minutes ago`;
+      if (diffInSeconds < 7200) return "1 hour ago";
+      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds/3600)} hours ago`;
+      if (diffInSeconds < 172800) return "1 day ago";
+      return `${Math.floor(diffInSeconds/86400)} days ago`;
+    }
+
+    function updateAllRelativeTimes() {
+      document.querySelectorAll('[data-time]').forEach(element => {
+        element.textContent = formatRelativeTime(element.dataset.time);
+      });
+    }
+
+    updateAllRelativeTimes();
+    setInterval(updateAllRelativeTimes, 30000);
+  </script>
+</body>
+</html>

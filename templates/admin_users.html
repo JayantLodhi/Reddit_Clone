@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Users</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="navbar">
+    <a href="{{ url_for('posts.feed') }}">
+      <img src="{{ url_for('static', filename='logo2.png') }}" alt="Reddit Clone" class="logo">
+    </a>
+    <div>
+      <span class="profile-link2">
+        <img src="{{ url_for('static', filename='avatar.png') }}" alt="profile" class="logo2"> a/{{ session['user'] }}
+      </span> | 
+      <a href="{{ url_for('admin.users') }}">Manage Users</a> | 
+      <a href="{{ url_for('posts.feed') }}">User View</a> | 
+      <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>User Management</h1>
+    
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background-color: #f0f0f0;">
+          <th style="padding: 10px; text-align: left;">Username</th>
+          <th style="padding: 10px; text-align: left;">Joined</th>
+          <th style="padding: 10px; text-align: left;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr style="border-bottom: 1px solid #ddd;">
+          <td style="padding: 10px;">
+            {% if user.is_admin %}a/{% else %}u/{% endif %}{{ user.username }}
+          </td>
+          <td style="padding: 10px;">
+            <span class="post-time" data-time="{{ user.created_at.isoformat() }}">just now</span>
+          </td>
+          <td style="padding: 10px;">
+            <a href="{{ url_for('admin.user_posts', username=user.username) }}">View Posts</a>
+            {% if not user.is_admin %}
+              | <form action="{{ url_for('admin.delete_user_route', username=user.username) }}" method="POST" 
+                   style="display: inline;" onsubmit="return confirm('Delete this user and all their content?');">
+                <button type="submit" class="delete-btn" style="padding: 2px 5px; font-size: 0.8rem;">Delete</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function formatRelativeTime(timeString) {
+      const now = new Date();
+      const postTime = new Date(timeString.endsWith('Z') ? timeString : timeString + 'Z');
+      const diffInSeconds = Math.floor((now - postTime) / 1000);
+      
+      if (diffInSeconds < 5) return "just now";
+      if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+      if (diffInSeconds < 120) return "1 minute ago";
+      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds/60)} minutes ago`;
+      if (diffInSeconds < 7200) return "1 hour ago";
+      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds/3600)} hours ago`;
+      if (diffInSeconds < 172800) return "1 day ago";
+      return `${Math.floor(diffInSeconds/86400)} days ago`;
+    }
+
+    function updateAllRelativeTimes() {
+      document.querySelectorAll('[data-time]').forEach(element => {
+        element.textContent = formatRelativeTime(element.dataset.time);
+      });
+    }
+
+    updateAllRelativeTimes();
+    setInterval(updateAllRelativeTimes, 30000);
+  </script>
+</body>
+</html>

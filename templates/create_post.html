@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Post - Reddit Clone</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="navbar">
+    <a href="{{ url_for('posts.feed') }}">
+      <img src="{{ url_for('static', filename='logo2.png') }}" alt="Reddit Clone" class="logo">
+    </a>
+    <div>
+      <a href="{{ url_for('posts.profile') }}" class="profile-link">
+        <img src="{{ url_for('static', filename='avatar.png') }}" alt="profile" class="logo2"> 
+        {% if session.get('is_admin') %}a/{% else %}u/{% endif %}{{ session['user'] }}
+      </a> | 
+      <a href="{{ url_for('posts.create') }}">Create Post</a> | 
+      {% if session.get('is_admin') %}
+        <a href="{{ url_for('admin.users') }}">Admin</a> | 
+      {% endif %}
+      <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="post-card">
+      <h2>Create a New Post</h2>
+      <form method="POST">
+        <input type="text" name="title" placeholder="Post title" class="post-title-input" required>
+        <textarea name="content" placeholder="Post content (what are your thoughts?)" class="post-content-input" rows="5" required></textarea>
+        <div class="post-actions">
+          <button type="submit" class="submit-post-btn">Post</button>
+          <a href="{{ url_for('posts.feed') }}" class="cancel-btn">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
