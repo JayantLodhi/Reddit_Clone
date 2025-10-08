@@ -123,5 +123,3 @@ Visit **http://localhost:5000** in your browser.
 this project was developed as the part of coursework / term project.
 
 ---
-
-> *Generated README for the Reddit_Clone Flask project. You can update section details or add screenshots before uploading to GitHub.*
