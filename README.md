@@ -16,6 +16,8 @@ This project is a simplified **Reddit Clone** where users can:
 
 This project demonstrates **Flask routing**, **templating**, and **ORM**-based data handling with **MongoDB**— ideal for learning backend web development in Python.
 
+![FrontPage](static/frontpage.png)
+
 ---
 
 ## 📂 Repository Structure
